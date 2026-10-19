@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<title>Keychron Q9 layers</title>
+<style>
+  @page { size: A4 portrait; margin: 12mm; }
+  :root {
+    --ink: #1a1a1a; --muted: #9a9a9a; --line: #555; --trans: #f3f3f3;
+    --held: #2f6fde; --held-tint: #dce8fb; --u: 9.6mm;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: var(--ink);
+         font: 10pt/1.35 -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  .page { width: 186mm; margin: 0 auto; }
+  h1 { font-size: 15pt; margin: 0 0 1mm; }
+  .sub { color: #555; margin: 0 0 5mm; font-size: 9pt; }
+  section { margin-bottom: 4.5mm; break-inside: avoid; }
+  h2 { font-size: 11.5pt; margin: 0 0 2mm; display: flex; align-items: baseline; gap: 3mm; }
+  h2 .how { font-weight: normal; font-size: 9pt; color: #444; }
+  .board { position: relative; width: calc(16.25 * var(--u)); height: calc(4 * var(--u)); }
+  .key { position: absolute; padding: 0.5mm; }
+  .cap { position: relative; width: 100%; height: 100%; border: 0.3mm solid var(--line);
+         border-radius: 1.4mm; display: flex; align-items: center; justify-content: center;
+         text-align: center; overflow: hidden; }
+  .cap.t { background: var(--trans); border-color: #c8c8c8; }
+  .cap.held { background: var(--held-tint); border: 0.6mm solid var(--held); }
+  .cap.knob { border-radius: 50%; }
+  .phys { position: absolute; top: 0.4mm; left: 1mm; font-size: 5.5pt; color: var(--muted); }
+  .shift { position: absolute; top: 0.4mm; right: 1mm; font-size: 6.5pt; color: #555; }
+  .main { font-size: 11pt; font-weight: 600; line-height: 1.05; }
+  .main.sm { font-size: 7pt; }
+  .cap.lbl { padding-top: 1.6mm; }
+  .tiny .main.sm { font-size: 6.3pt; }
+  .note { display: block; font-size: 5.5pt; font-weight: normal; color: #444; margin-top: 0.3mm; }
+  .held .main { color: var(--held); font-size: 7.5pt; }
+  ul { margin: 0; padding-left: 4.5mm; font-size: 8.8pt; }
+  li { margin-bottom: 0.8mm; }
+  code { font: 8pt Menlo, monospace; }
+  @media screen { body { padding: 16px; background: #e9e9e9; }
+                  .page { background: #fff; padding: 12mm; width: 210mm; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Keychron Q9 – layers</h1>
+  <p class="sub">macOS, input source Swedish – Pro. Small grey letter = printed keycap. Grey key = nothing new on that layer (works as normal).</p>
+  <div id="out"></div>
+  <section>
+    <h2>Good to know</h2>
+    <ul>
+      <li>Shift works on top of Fn: Shift+Fn+1 = <b>!</b>, Shift+Fn+8 = <b>(</b>, Shift+Fn+Tab = <b>°</b> (small labels top right).</li>
+      <li><b>~</b> is a dead key: Fn+Ä, then Space.</li>
+      <li>Caps Lock: tap = <b>Esc</b> (fires on release), hold = navigation layer.</li>
+      <li>Select text: hold Caps + S (⇧), then J/L. Add D (⌥) for whole words, F (⌘) to the end of the line.</li>
+      <li>Knob: turn = volume, press = mute. With Fn2 held: turn = key lighting brightness, press = lighting on/off.</li>
+      <li>Change or restore: <code>~/Development/keychron-q9/q9_keymap.py</code> (backup-2026-10-06.json).</li>
+    </ul>
+  </section>
+</div>
+<script>
+// [id, x, y, w, h] in key units, from QMK keychron/q9/iso_encoder LAYOUT_iso_53
+const K = [];
+const row = (ids, x0, y, w = 1) => ids.forEach((id, i) => K.push([id, x0 + i * w, y, w, 1]));
+K.push(['Tab', 0, 0, 1.5, 1]); row([...'QWERTYUIOPÅ'], 1.5, 0); K.push(['Del', 12.5, 0, 1, 1]);
+K.push(['Enter', 13.75, 0, 1.25, 2]); K.push(['Knob', 15.25, 0, 1, 1]);
+K.push(['Caps', 0, 1, 1.75, 1]); row([...'ASDFGHJKLÖÄ'], 1.75, 1); K.push(['\'*', 12.75, 1, 1, 1]);
+K.push(['End', 15.25, 1.25, 1, 1]);
+K.push(['Shift', 0, 2, 1.25, 1]); K.push(['<>', 1.25, 2, 1, 1]); row([...'ZXCVBNM,.-'], 2.25, 2);
+K.push(['RShift', 12.25, 2, 1.75, 1]); K.push(['Up', 14, 2, 1, 1]);
+K.push(['Ctrl', 0, 3, 1.25, 1]); K.push(['Opt', 1.25, 3, 1.25, 1]); K.push(['Cmd', 2.5, 3, 1.25, 1]);
+K.push(['Space', 3.75, 3, 6.25, 1]); K.push(['Fn', 10, 3, 1, 1]); K.push(['RCmd', 11, 3, 1, 1]);
+K.push(['Fn2', 12, 3, 1, 1]); K.push(['Left', 13, 3, 1, 1]); K.push(['Down', 14, 3, 1, 1]); K.push(['Right', 15, 3, 1, 1]);
+
+const PHYS = { Del: 'Del', Enter: '⏎', Knob: '◎', Caps: 'Caps', '\'*': '\'*', End: 'End', Shift: '⇧', RShift: '⇧',
+  Up: '↑', Ctrl: 'ctrl', Opt: '⌥', Cmd: '⌘', RCmd: '⌘', Space: '', Fn: 'Fn', Fn2: 'Fn2', Left: '←', Down: '↓', Right: '→' };
+
+const BASE = { Tab: 'Tab', Del: '⌫', Enter: '⏎', Knob: ['mute', '', 'turn: vol'], Caps: 'Esc', '\'*': '\' *', End: 'Del →',
+  Shift: '⇧', '<>': '< >', RShift: '⇧', Up: '↑', Ctrl: 'ctrl', Opt: '⌥', Cmd: '⌘', Space: 'Space',
+  Fn: 'Fn', RCmd: '⌘', Fn2: 'Fn2', Left: '←', Down: '↓', Right: '→' };
+[...'QWERTYUIOPÅASDFGHJKLÖÄZXCVBNM,.-'].forEach(c => BASE[c] = c);
+
+const LAYERS = [
+  { title: 'Base', how: 'nothing held', map: BASE, plain: true },
+  { title: 'Fn layer: numbers & symbols', how: 'hold Fn — first key right of Space', held: 'Fn', map: {
+      Tab: ['§', '°'], Q: ['1', '!'], W: ['2', '"'], E: ['3', '#'], R: ['4', '€'], T: ['5', '%'], Y: ['6', '&'],
+      U: ['7', '/'], I: ['8', '('], O: ['9', ')'], P: ['0', '='], 'Å': ['+', '?'], Del: '⌫',
+      Caps: 'Esc', A: '@', S: '$', D: '{', F: '}', G: '|', H: '\\', J: '[', K: ']', L: '(', 'Ö': ')',
+      'Ä': ['~', '', '+ Space'], '\'*': '⌫', End: ['¨', '^'],
+      Z: 'F1', X: 'F2', C: 'F3', V: 'F4', B: 'F5', N: 'F6', M: 'F7', ',': 'F8', '.': 'F9', '-': 'F10',
+      RShift: 'F11', Up: 'F12' } },
+  { title: 'Caps layer: arrows & navigation', how: 'hold Caps Lock (tap = Esc)', held: 'Caps', map: {
+      W: ['⌘W', '', 'close'], Y: ['PgUp'], U: ['⌥←', '', 'word'], I: '↑', O: ['⌥→', '', 'word'],
+      S: ['⇧', '', 'select'], D: '⌥', F: '⌘', H: ['⌘←', '', 'line start'], J: '←', K: '↓', L: '→',
+      'Ö': ['⌘→', '', 'line end'], Z: ['⌘Z', '', 'undo'], X: ['⌘X', '', 'cut'], C: ['⌘C', '', 'copy'],
+      V: ['⌘V', '', 'paste'], N: ['PgDn'] } },
+  { title: 'Fn2 layer: media & lighting', how: 'hold Fn2 — third key right of Space (Keychron default)', held: 'Fn2', tiny: true, map: {
+      Tab: '§', Q: ['screen', '', '−'], W: ['screen', '', '+'], E: ['Mission', '', 'Control'], R: ['Launch', '', 'pad'],
+      T: ['light', '', '−'], Y: ['light', '', '+'], U: 'prev', I: 'play', O: 'next', P: 'mute',
+      'Å': ['vol', '', '−'], Del: ['vol', '', '+'], Knob: ['light', '', 'on/off'],
+      Caps: ['light', '', 'on/off'], A: ['mode', '', 'next'], S: ['light', '', '+'], D: ['hue', '', '+'],
+      F: ['sat', '', '+'], G: ['speed', '', '+'], H: ['NKRO', '', 'leave'],
+      Z: ['mode', '', 'prev'], X: ['light', '', '−'], C: ['hue', '', '−'], V: ['sat', '', '−'], B: ['speed', '', '−'] } },
+];
+
+const out = document.getElementById('out');
+for (const L of LAYERS) {
+  const sec = document.createElement('section');
+  if (L.tiny) sec.className = 'tiny';
+  sec.innerHTML = `<h2>${L.title}<span class="how">${L.how}</span></h2>`;
+  const board = document.createElement('div'); board.className = 'board';
+  for (const [id, x, y, w, h] of K) {
+    const key = document.createElement('div'); key.className = 'key';
+    Object.assign(key.style, { left: `calc(${x} * var(--u))`, top: `calc(${y} * var(--u))`,
+      width: `calc(${w} * var(--u))`, height: `calc(${h} * var(--u))` });
+    const cap = document.createElement('div'); cap.className = 'cap' + (id === 'Knob' ? ' knob' : '');
+    const phys = PHYS[id] ?? id;
+    let v = L.map[id];
+    if (id === L.held) { cap.classList.add('held'); v = ['HELD']; }
+    if (v === undefined) {
+      cap.classList.add('t');
+      cap.innerHTML = `<span class="main sm" style="color:#b5b5b5;font-weight:500">${phys}</span>`;
+    } else {
+      const [main, shifted = '', note = ''] = Array.isArray(v) ? v : [v];
+      const sm = (L.tiny && main.length > 1 || main.length > 3 || /[⌘⌥]/.test(main) && main.length > 1) ? ' sm' : '';
+      if (!L.plain) cap.classList.add('lbl');
+      cap.innerHTML = (L.plain ? '' : `<span class="phys">${phys}</span>`) +
+        (shifted ? `<span class="shift">${shifted}</span>` : '') +
+        `<span class="main${sm}">${main}${note ? `<span class="note">${note}</span>` : ''}</span>`;
+    }
+    key.appendChild(cap); board.appendChild(key);
+  }
+  sec.appendChild(board); out.appendChild(sec);
+}
+</script>
+</body>
+</html>
